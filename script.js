@@ -17,67 +17,63 @@ function getComputerChoice() {
   return choices[Math.floor(Math.random() * choices.length)];
 }
 
-console.log(getComputerChoice());
+// Create the container
+const container = document.createElement('div')
+document.body.appendChild(container)
 
-// funntion to take the user's choice
-function getHumanChoice() {
-    return prompt("Select rock, paper or scissors! ")
+// Create score display
+const scoreDisplay = document.createElement('div');
+container.appendChild(scoreDisplay);
+
+// Function to update score display
+function updateScoreDisplay() {
+  scoreDisplay.textContent = `Your Score: ${humanScore} Computer Score: ${computerScore}`;
 }
 
-console.log(getHumanChoice())
+// Function to play a round
+function playRound(humanChoice) {
+  const computerChoice = getComputerChoice();
+  
+  let resultMessage = "";
 
-// Logic for a single round
-// conditions:
-// the same = tie
-// 1. human = rock computer scissor: you scored a point
-// 2. human paper computer scissor: computer scores
-// 3. human paper computer rock: human scores
-// 4. human scissors computer rock: computer scores
-// 5. human rock computer paper: computer scores
-// 6. human scissors computer paper human scores.
-
-// Single round function
-function playRound(humanChoice, computerChoice) {
-    humanChoice = humanChoice.toLowerCase();
-
-    if (humanChoice === computerChoice) { 
-      console.log(" comuters choice is " + computerChoice + " It's a tie!");
-    }
-    else if (humanChoice === "rock" && computerChoice === "scissors") {
-      humanScore += 1
-      console.log(" comuters choice is " + computerChoice + " You won!");
-    }
-    else if (humanChoice === "paper" && computerChoice === "scissors") {
-      computerScore += 1
-      console.log(" comuters choice is " + computerChoice + " You lost!");
-    }
-    else if (humanChoice == "paper" && computerChoice == "rock") {
-      humanScore += 1
-      console.log(" comuters choice is " + computerChoice + " You won!");
-    }
-    else if (humanChoice === "scissors" && computerChoice === "rock") {
-      computerScore += 1
-      console.log(" comuters choice is " + computerChoice + " You lost!");
-    }
-    else if (humanChoice === "rock" && computerChoice === "paper") {
-      computerScore += 1
-      console.log(" comuters choice is " + computerChoice + " You lost!");
-    }
-    else if (humanChoice === "scissors" && computerChoice === "paper") {
-      humanScore += 1
-      console.log(" comuters choice is " + computerChoice + " You won!");
-    }
-
+  if (humanChoice === computerChoice) {
+    resultMessage = "It's a tie!";
+  } else if (
+    (humanChoice === "rock" && computerChoice === "scissors") ||
+    (humanChoice === "paper" && computerChoice === "rock") ||
+    (humanChoice === "scissors" && computerChoice === "paper")
+  ) {
+    humanScore++;
+    resultMessage = "You won!";
+  } else {
+    computerScore++;
+    resultMessage = "You lost!";
   }
 
-  // Game function
-    function playGame() {
-      for (let i = 0; i < 5; i++) {
-        playRound(getHumanChoice(), getComputerChoice());
-        console.log("Your score is " + humanScore + " and the computers score is " + computerScore);
-      }
-    }
+  // message after each choice
+  const roundResult = document.createElement('div');
+  roundResult.textContent = `You chose ${humanChoice}. Computer chose ${computerChoice}. ${resultMessage}`;
+  container.appendChild(roundResult);
 
-    playGame();
+  updateScoreDisplay();
 
+  if (humanScore === 5 || computerScore === 5) {
+    const gameOver = document.createElement('div');
+    gameOver.textContent = humanScore > computerScore ? "You won the game!" : "Computer won the game!";
+    container.appendChild(gameOver);
+    
+    // Disable buttons after game over
+    choiceButtons.forEach(button => button.disabled = true);
+  }
+} 
+// Create choice buttons
+const choiceButtons = choices.map(choice => {
+  const button = document.createElement('button');
+  button.textContent = choice.charAt(0).toUpperCase() + choice.slice(1);
+  button.addEventListener('click', () => playRound(choice));
+  container.appendChild(button);
+  return button;
+});
 
+// Initial score display
+updateScoreDisplay();
